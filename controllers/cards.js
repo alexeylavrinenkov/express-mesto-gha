@@ -28,16 +28,16 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  const { _id: userId } = req.user;
+  const owner = req.user._id;
 
-  Card.create({ name, link, userId })
+  Card.create({ name, link, owner })
     .then((card) => {
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(VALIDATION_ERROR_STATUS).send({
-          message: 'Переданы некорректные данные в методы создания карточки',
+          message: 'Переданы некорректные данные в метод создания карточки',
         });
         return;
       }
@@ -51,12 +51,25 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
+      if (!card) {
+        const err = new Error('Карточка не найдена');
+        err.name = 'notFoundError';
+        throw err;
+      }
+
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
+        res.status(VALIDATION_ERROR_STATUS).send({
+          message: 'Некорректный id карточки',
+        });
+        return;
+      }
+
+      if (err.name === 'notFoundError') {
         res.status(NOT_FOUND_ERROR_STATUS).send({
-          message: 'Карточка не найдена',
+          message: err.message,
         });
         return;
       }
@@ -70,12 +83,25 @@ const deleteCard = (req, res) => {
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
+      if (!card) {
+        const err = new Error('Карточка не найдена');
+        err.name = 'notFoundError';
+        throw err;
+      }
+
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
+        res.status(VALIDATION_ERROR_STATUS).send({
+          message: 'Некорректный id карточки',
+        });
+        return;
+      }
+
+      if (err.name === 'notFoundError') {
         res.status(NOT_FOUND_ERROR_STATUS).send({
-          message: 'Карточка не найдена',
+          message: err.message,
         });
         return;
       }
@@ -87,14 +113,27 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
+      if (!card) {
+        const err = new Error('Карточка не найдена');
+        err.name = 'notFoundError';
+        throw err;
+      }
+
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
+        res.status(VALIDATION_ERROR_STATUS).send({
+          message: 'Некорректный id карточки',
+        });
+        return;
+      }
+
+      if (err.name === 'notFoundError') {
         res.status(NOT_FOUND_ERROR_STATUS).send({
-          message: 'Карточка не найдена',
+          message: err.message,
         });
         return;
       }
