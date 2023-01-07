@@ -88,7 +88,7 @@ const createUser = (req, res) => {
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         const err = new Error('Пользователь не найден');
@@ -102,6 +102,13 @@ const updateProfile = (req, res) => {
       if (err.name === 'CastError') {
         res.status(VALIDATION_ERROR_STATUS).send({
           message: 'Некорректный id пользователя',
+        });
+        return;
+      }
+
+      if (err.name === 'ValidationError') {
+        res.status(VALIDATION_ERROR_STATUS).send({
+          message: 'Переданы некорректные данные в метод обновления профиля пользователя',
         });
         return;
       }
@@ -122,7 +129,7 @@ const updateProfile = (req, res) => {
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         const err = new Error('Пользователь не найден');
@@ -136,6 +143,13 @@ const updateAvatar = (req, res) => {
       if (err.name === 'CastError') {
         res.status(VALIDATION_ERROR_STATUS).send({
           message: 'Некорректный id пользователя',
+        });
+        return;
+      }
+
+      if (err.name === 'ValidationError') {
+        res.status(VALIDATION_ERROR_STATUS).send({
+          message: 'Переданы некорректные данные в метод обновления аватара пользователя',
         });
         return;
       }
