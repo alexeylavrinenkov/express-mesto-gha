@@ -25,7 +25,6 @@ const createCard = (req, res) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .populate(['owner', 'likes'])
     .then((card) => {
       res.send({ data: card });
     })
