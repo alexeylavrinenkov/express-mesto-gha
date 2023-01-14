@@ -1,11 +1,10 @@
-require('dotenv').config();
 const User = require('../models/user');
 
 const {
-  VALIDATION_ERROR_STATUS,
-  NOT_FOUND_ERROR_STATUS,
-  INTERNAL_SERVER_ERROR_STATUS,
-} = process.env;
+  validationErrorStatus,
+  notFoundErrorStatus,
+  internalServerErrorStatus,
+} = require('../utils/constants');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -13,7 +12,7 @@ const getUsers = (req, res) => {
       res.send({ data: users });
     })
     .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -32,20 +31,20 @@ const getUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Некорректный id пользователя',
         });
         return;
       }
 
       if (err.name === 'notFoundError') {
-        res.status(NOT_FOUND_ERROR_STATUS).send({
+        res.status(notFoundErrorStatus).send({
           message: err.message,
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -60,13 +59,13 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Переданы некорректные данные в метод создания пользователя',
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -87,20 +86,20 @@ const updateProfile = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Переданы некорректные данные в метод обновления профиля пользователя',
         });
         return;
       }
 
       if (err.name === 'notFoundError') {
-        res.status(NOT_FOUND_ERROR_STATUS).send({
+        res.status(notFoundErrorStatus).send({
           message: err.message,
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -121,20 +120,20 @@ const updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Переданы некорректные данные в метод обновления аватара пользователя',
         });
         return;
       }
 
       if (err.name === 'notFoundError') {
-        res.status(NOT_FOUND_ERROR_STATUS).send({
+        res.status(notFoundErrorStatus).send({
           message: err.message,
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });

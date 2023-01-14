@@ -1,9 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-require('dotenv').config();
-
-const { PORT, NOT_FOUND_ERROR_STATUS } = process.env;
+const { port, notFoundErrorStatus } = require('./utils/constants');
 
 const app = express();
 
@@ -25,11 +23,11 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use('*', (req, res) => {
-  res.status(NOT_FOUND_ERROR_STATUS).send({
+  res.status(notFoundErrorStatus).send({
     message: 'Ресурс не найден',
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`App listening on port ${port}`);
 });

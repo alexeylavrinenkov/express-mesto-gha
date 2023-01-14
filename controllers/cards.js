@@ -1,11 +1,9 @@
-require('dotenv').config();
 const Card = require('../models/card');
-
 const {
-  VALIDATION_ERROR_STATUS,
-  NOT_FOUND_ERROR_STATUS,
-  INTERNAL_SERVER_ERROR_STATUS,
-} = process.env;
+  validationErrorStatus,
+  notFoundErrorStatus,
+  internalServerErrorStatus,
+} = require('../utils/constants');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -14,7 +12,7 @@ const getCards = (req, res) => {
       res.send({ data: cards });
     })
     .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -30,13 +28,13 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Переданы некорректные данные в метод создания карточки',
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -56,20 +54,20 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Некорректный id карточки',
         });
         return;
       }
 
       if (err.name === 'notFoundError') {
-        res.status(NOT_FOUND_ERROR_STATUS).send({
+        res.status(notFoundErrorStatus).send({
           message: err.message,
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -89,20 +87,20 @@ const likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Некорректный id карточки',
         });
         return;
       }
 
       if (err.name === 'notFoundError') {
-        res.status(NOT_FOUND_ERROR_STATUS).send({
+        res.status(notFoundErrorStatus).send({
           message: err.message,
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
@@ -122,20 +120,20 @@ const dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(VALIDATION_ERROR_STATUS).send({
+        res.status(validationErrorStatus).send({
           message: 'Некорректный id карточки',
         });
         return;
       }
 
       if (err.name === 'notFoundError') {
-        res.status(NOT_FOUND_ERROR_STATUS).send({
+        res.status(notFoundErrorStatus).send({
           message: err.message,
         });
         return;
       }
 
-      res.status(INTERNAL_SERVER_ERROR_STATUS).send({
+      res.status(internalServerErrorStatus).send({
         message: 'На сервере произошла ошибка',
       });
     });
