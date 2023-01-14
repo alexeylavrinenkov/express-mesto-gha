@@ -1,7 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { port, notFoundErrorStatus } = require('./utils/constants');
+const { notFoundErrorStatus } = require('./utils/constants');
+require('dotenv').config();
+
+const { PORT } = process.env;
 
 const app = express();
 
@@ -28,6 +31,6 @@ app.use('*', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
 });
