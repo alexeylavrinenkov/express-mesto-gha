@@ -1,24 +1,20 @@
 const Card = require('../models/card');
-const {
-  validationErrorStatus,
-  notFoundErrorStatus,
-  internalServerErrorStatus,
-} = require('../utils/constants');
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch(() => {
-      res.status(internalServerErrorStatus).send({
-        message: 'На сервере произошла ошибка',
-      });
+    .catch((err) => {
+      next(err);
     });
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -28,114 +24,79 @@ const createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(validationErrorStatus).send({
-          message: 'Переданы некорректные данные в метод создания карточки',
-        });
-        return;
+        return next(new ValidationError('Переданы некорректные данные в метод создания карточки'));
       }
 
-      res.status(internalServerErrorStatus).send({
-        message: 'На сервере произошла ошибка',
-      });
+      return next(err);
     });
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .populate(['owner', 'likes'])
+const deleteCard = (req, res, next) => {
+  const { cardId } = req.params;
+
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        const err = new Error('Карточка не найдена');
-        err.name = 'notFoundError';
-        throw err;
+        throw new NotFoundError('Карточка не найдена');
       }
 
-      res.send({ data: card });
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Удаление чужой карточки');
+      }
+
+      return Card.findByIdAndRemove(cardId)
+        .populate(['owner', 'likes'])
+        .then((myCard) => {
+          res.send({ data: myCard });
+        })
+        .catch((err) => {
+          next(err);
+        });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({
-          message: 'Некорректный id карточки',
-        });
-        return;
+        return next(new ValidationError('Некорректный id карточки'));
       }
 
-      if (err.name === 'notFoundError') {
-        res.status(notFoundErrorStatus).send({
-          message: err.message,
-        });
-        return;
-      }
-
-      res.status(internalServerErrorStatus).send({
-        message: 'На сервере произошла ошибка',
-      });
+      return next(err);
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        const err = new Error('Карточка не найдена');
-        err.name = 'notFoundError';
-        throw err;
+        throw new NotFoundError('Карточка не найдена');
       }
 
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({
-          message: 'Некорректный id карточки',
-        });
-        return;
+        return next(new ValidationError('Некорректный id карточки'));
       }
 
-      if (err.name === 'notFoundError') {
-        res.status(notFoundErrorStatus).send({
-          message: err.message,
-        });
-        return;
-      }
-
-      res.status(internalServerErrorStatus).send({
-        message: 'На сервере произошла ошибка',
-      });
+      return next(err);
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
-        const err = new Error('Карточка не найдена');
-        err.name = 'notFoundError';
-        throw err;
+        throw new NotFoundError('Карточка не найдена');
       }
 
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(validationErrorStatus).send({
-          message: 'Некорректный id карточки',
-        });
-        return;
+        return next(new ValidationError('Некорректный id карточки'));
       }
 
-      if (err.name === 'notFoundError') {
-        res.status(notFoundErrorStatus).send({
-          message: err.message,
-        });
-        return;
-      }
-
-      res.status(internalServerErrorStatus).send({
-        message: 'На сервере произошла ошибка',
-      });
+      return next(err);
     });
 };
 
