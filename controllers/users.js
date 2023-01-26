@@ -67,7 +67,13 @@ const createUser = (req, res, next) => {
         throw new NotFoundError('Пользователь не найден');
       }
 
-      res.send({ data: user });
+      res.send({
+        _id: user._id,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -144,8 +150,15 @@ const login = (req, res, next) => {
               maxAge: 7 * 24 * 60 * 60 * 1000,
               httpOnly: true,
               sameSite: true,
-            })
-            .end();
+            });
+
+          res.send({
+            _id: user._id,
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+          });
         });
     })
     .catch((err) => {

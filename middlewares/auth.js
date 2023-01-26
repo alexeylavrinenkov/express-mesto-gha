@@ -3,13 +3,12 @@ const UnauthorizedError = require('../errors/UnauthorizedError');
 const { secretKey } = require('../utils/constants');
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
+  const token = req.cookies.jwt;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!token) {
     return next(new UnauthorizedError('Необходима авторизация'));
   }
 
-  const token = authorization.split(' ')[1];
   let payload;
 
   try {
