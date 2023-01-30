@@ -38,7 +38,7 @@ npm start
 ## Другие учебные проекты из Яндекс Практикума
 1. [Научиться учиться](https://github.com/alexeylavrinenkov/how-to-learn)
 2. [Путешествие по России](https://github.com/alexeylavrinenkov/russian-travel)
-3. [Mesto (чистый JavaScript)](https://github.com/alexeylavrinenkov/mesto-react)
+3. [Mesto (чистый JavaScript)](https://github.com/alexeylavrinenkov/mesto)
 4. [Mesto (React)](https://github.com/alexeylavrinenkov/mesto-react)
 5. [Mesto (React, авторизация)](https://github.com/alexeylavrinenkov/react-mesto-auth)
 6. Mesto (серверная часть) ⬅ текущий репозиторий
